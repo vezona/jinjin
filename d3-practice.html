@@ -91,13 +91,13 @@
             margin = 60,
                 chartWidth = svgwidth - margin,
                 chartHeight = svgheight - margin * 2;
-            console.log(svgwidth, svgheight)
+            // console.log(svgwidth, svgheight)
 
             // 限定寬高不可以小於200
             chartWidth = svgwidth < 200 ? 200 : chartWidth;
             chartHeight = svgheight < 300 ? 230 : chartHeight;
             chartHeight = chartHeight > 500 ? 450 : chartHeight;
-            console.log(chartWidth, chartHeight)
+            // console.log(chartWidth, chartHeight)
 
             // 繪製畫布
             svg.html(''); //刪掉重rend
