@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>w2 main homework</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<!-- https://rpg.hexschool.com/training/18/task -->
+
+<body>
+    <div class="container">
+        <div id="app" class="container">
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>產品名稱</th>
+                        <th width="120">
+                            原價
+                        </th>
+                        <th width="120">
+                            售價
+                        </th>
+                        <th width="150">
+                            是否啟用
+                        </th>
+                        <th width="120">
+                            刪除
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="productList">
+                    <tr>
+                        <td>範例標題</td>
+                        <td width="120">
+                            範例原價
+                        </td>
+                        <td width="120">
+                            範例價格
+                        </td>
+                        <td width="100">
+                            <span class="">範例啟用狀態</span>
+                        </td>
+                        <td width="120">
+                            <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn"
+                                data-action="remove" data-id=""> 刪除 </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>目前有 <span id="productCount">0</span> 項產品</p>
+        </div>
+    </div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js'
+        integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw=='
+        crossorigin='anonymous'></script>
+
+    <script>
+        const apiPath = "ffjjgogogo";
+        const container = document.querySelector(".container");
+        const productList = document.querySelector("#productList");
+        let apiPage = 1;
+        let productAPIData;
+
+        axios.get(`https://vue3-course-api.hexschool.io/api/${apiPath}/products?page=${apiPage}`)
+            .then(res => {
+                // console.log(res)
+                renderProductList(res)
+            }).catch();
+
+        function renderProductList(data) {
+            // console.log(res)
+            let productLists = data.data.products;
+            let str = "";
+            console.log(productLists)
+            productLists.forEach(function (item, i) {
+                str += `
+                <tr>
+                    <td> ${item.title}</td>
+                    <td width="120">
+                        ${item.origin_price}
+                    </td>
+                    <td width="120">
+                        ${item.price}
+                    </td>
+                    <td width="100">
+                        <span class=""> ${item.is_enabled}</span>
+                    </td>
+                    <td width="120">
+                        <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn"
+                            data-action="remove" data-id=""> 刪除 </button>
+                    </td>
+                </tr>`
+            })
+
+            productList.innerHTML = str;
+
+
+
+        }
+    </script>
+</body>
+
+</html>
