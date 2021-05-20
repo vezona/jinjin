@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13 Resize</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        #wrapper {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-width: 300px;
+            max-width: 960px;
+            /* max-height: 500px; */
+            min-height: 250px;
+            overflow: hidden;
+        }
+
+        /* 
+        svg {
+            outline: 1px solid red;
+        } */
+
+        /* #wrapper {
+            outline: 1px solid red;
+        } */
+    </style>
+</head>
+
+<body>
+    <div id="wrapper"></div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        const wrapper = d3.select('#wrapper');
+        const svg = wrapper.append('svg');
+
+        // 取到的資料
+        let data = [], //get資料
+            dataset = [], //取出XY軸要用的陣列資料
+            xData,
+            dataset2 = [],
+            filterPriceData2 = [];
+
+        // 先取資料
+        async function getData() {
+            const getData = await d3.json('./data.json'),
+                getDataset = getData.objlist.map(d => d),
+                getFilterPriceData = getDataset.filter(d => d.UnitPrice !== 0);
+
+            // const XData = getData.objlist.map(d => d.Date)
+            // console.log(XData)
+            // 資料存到全域
+            data = getData;
+            dataset = getDataset;
+            filterPriceData = getFilterPriceData;
+            xData = dataset.map(d => parseInt(d.Date.slice(4)))
+
+            // 取第二筆資料畫折線圖
+            const getData2 = await d3.json('./data2.json'),
+                getDataset2 = getData2.objlist.map(d => d),
+                getFilterPriceData2 = getDataset2.filter(d => d.UnitPrice !== 0);
+
+            dataset2 = getDataset2;
+            filterPriceData2 = getFilterPriceData2;
+
+            rendering()
+
+        }
+
+        function rendering() {
+            let svgwidth = parseInt(d3.select('#wrapper').style('width')),
+                // svgheight = parseInt(d3.select('#wrapper').style('height')),
+                svgheight = svgwidth * 0.7
+            margin = 60,
+                chartWidth = svgwidth - margin,
+                chartHeight = svgheight - margin * 2;
+            console.log(svgwidth, svgheight)
+
+            // 限定寬高不可以小於200
+            chartWidth = svgwidth < 200 ? 200 : chartWidth;
+            chartHeight = svgheight < 300 ? 230 : chartHeight;
+            chartHeight = chartHeight > 500 ? 450 : chartHeight;
+            console.log(chartWidth, chartHeight)
+
+            // 繪製畫布
+            svg.html(''); //刪掉重rend
+
+            svg.attr('width', chartWidth + margin * 2)
+                .attr('height', chartHeight + margin * 2)
+
+            // X軸
+            // 設定X軸參數
+            // const xAccessor = (d) => d.map(d => parseInt(d.Date.slice(4)))
+            const xAccessor = d => parseInt(d.Date.slice(4))
+            // console.log(dataset.map(d => parseInt(d.Date.slice(4))))
+
+            // 設定X軸範圍:月份
+            let xScale = d3.scaleBand()
+                // .domain(xAccessor(dataset))
+                // .domain(dataset.map(d => parseInt(d.Date.slice(4))))  //簡化成xData
+                .domain(xData)
+                .range([0, chartWidth - margin])
+                .padding([0.9]) //決定tick之前的間距 (會影響長條圖的width)
+
+            // X軸線與ticks
+            let xAxis = d3.axisBottom(xScale) //tick在axis下方的線，根據xScale給的範圍來訂
+                .tickSizeOuter(0) //最左右兩側不用tick的線
+                .tickSizeInner(-(chartHeight - margin)) //軸線向內(上)延伸，比照繪圖區高度
+                .tickPadding(10) //tick text與軸線拉開距離
+
+            // 手機板時減少X軸的tick
+            let xMobileTicks = []
+            xData.forEach(item => {
+                if (item % 2 == 0) {
+                    // console.log(item)
+                    xMobileTicks.push(item)
+                }
+            })
+
+            let xAxisWeb;
+            // 手機板跟電腦版的tick數量改動
+            if (svgwidth < 500) {
+                // .tickValues() 控制哪些tick要顯示
+                // .tickValues(xMobileTicks)
+                xAxisWeb = xAxis.tickFormat(function (d) { //把設定好的軸線跟ticks接過來，用tickFormat綁上文字
+                    return d + "月";
+                }).tickValues(xMobileTicks);
+
+            } else {
+                xAxisWeb = xAxis.tickFormat(function (d) { //把設定好的軸線跟ticks接過來，用tickFormat綁上文字
+                    return d + "月";
+                });
+            }
+
+            // 繪製X軸
+            const xAxisLine = svg.append('g')
+                .attr('class', 'xAxis')
+                .style('transform', `translate(${margin}px,${chartHeight}px)`) //讓X軸到最下方
+                .call(xAxisWeb)
+
+            // X軸線位移(左右終點)
+            // svg.select('.xAxis').selectAll('.tick text') //先挪文字到軸線中間
+            //     .attr("dx", `-${margin/2}`);
+
+            // svg.select('.xAxis').selectAll('.tick line')
+            //     .attr('transform', `translate(${margin/4}, 0)`)
+
+
+            // 改變X軸顏色與粗細
+            xAxisLine.select(".domain")
+                .attr("stroke", "orange")
+                .attr("stroke-width", "3")
+                .attr("opacity", "0.8")
+
+            // Y1軸繪製:每坪單價 UnitPrice
+            // 設定Y1軸參數
+            const y1Accessor = (d) => d.UnitPrice
+            // console.log(dataset.map((d) => d.UnitPrice))
+
+            // 設定Y1軸範圍:坪數/萬
+            const y1Scale = d3.scaleLinear()
+                .domain([0, 70]) //+10以免最高點超過座標軸範圍
+                .range([chartHeight, margin]) //上方留點範圍加標籤
+
+            // Y1軸線與ticks
+            const y1Axis = d3.axisLeft()
+                .scale(y1Scale)
+                .ticks(6)
+                .tickSizeOuter(0) //最左右兩側不用tick的線
+                .tickSizeInner(-(chartWidth - margin)) //軸線向內(上)延伸，比照繪圖區高度
+                .tickPadding(10) //tick text與軸線拉開距離
+
+            // 繪製Y1軸
+            const y1AxisLine = svg.append('g')
+                .attr('class', 'y1Axis')
+                .style('transform', `translate(${margin}px,0)`) //調整Y1軸位置
+                .call(y1Axis);
+
+            // 加上Y1標籤           
+            const y1AxisLabel = y1AxisLine
+                .append("text")
+                .attr("class", "y1axis-label")
+                .text("單價 / 萬")
+                .attr("x", margin / 3)
+                .attr("y", 40)
+                .style("fill", "black")
+
+            // 改變Y軸顏色與粗細
+            y1AxisLine.select(".domain")
+                .attr("stroke", "orange")
+                .attr("stroke-width", "3")
+                .attr("opacity", "0.8");
+
+            // Y2軸繪製:賣出戶數 TradeHouse
+            // 設定Y2軸參數
+            const y2Accessor = d => d.TradeHouse
+            // console.log("y2", dataset.map(d => d.TradeHouse))
+
+            // 設定Y2軸範圍:成交/戶數
+            const y2Scale = d3.scaleLinear()
+                .domain([0, d3.max(dataset.map(d => d.TradeHouse)) + 2]) //+2以免最高點超過座標軸範圍
+                .range([chartHeight, margin]) //上方留點範圍加標籤
+
+            // Y2軸線與ticks
+            const y2Axis = d3.axisRight()
+                .scale(y2Scale)
+                .ticks(6) //設定要有幾個tick
+                .tickSizeOuter(0) //最左右兩側不用tick的線
+                .tickSizeInner(0)
+                .tickPadding(10)
+
+            // 繪製Y2軸
+            const y2AxisLine = svg.append('g')
+                .attr('class', 'y2Axis')
+                .style('transform', `translate(${chartWidth}px,0)`) //調整Y2軸位置，留20給位移後的位置
+                .call(y2Axis);
+
+            const y2AxisLabel = y2AxisLine
+                .append("text")
+                .attr("class", "y2axis-label")
+                .text("成交 / 戶")
+                .attr("x", -(margin / 3))
+                .attr("y", 40)
+                .style("fill", "black")
+
+            // 繪製Y軸折線圖
+            const lineChart = d3.line()
+                .x((d) => xScale(xAccessor(d)) + margin)
+                .y((d) => y1Scale(y1Accessor(d)))
+                .defined(d => d.UnitPrice > 0)
+                .curve(d3.curveLinear); //決定曲線線條
+            // console.log(dataset.map(d => y1Scale(y1Accessor(d))))
+            // console.log(dataset.map(d => xScale(xAccessor(d))))
+
+            // 有資料的線
+            const line = svg.append('g')
+                .append("path")
+                .attr("d", lineChart(dataset))
+                .attr("fill", "none")
+                .attr("stroke", "orange")
+                .attr("stroke-width", 2);
+
+            let filteredData = dataset.filter(lineChart.defined());
+
+            // 覆蓋的dashed
+            svg.append('g')
+                .append("path")
+                .attr("d", lineChart(filteredData))
+                .attr("fill", "none")
+                .attr("stroke", "orange")
+                .attr("stroke-width", 2)
+                .style("stroke-dasharray", "4,4");
+
+            // 折線圖圓點點
+            svg.selectAll('.dot')
+                .data(filteredData)
+                .enter()
+                .append('g')
+                .classed('dot', true)
+                .append('circle')
+                .attr('cx', d => xScale(xAccessor(d)) + margin)
+                .attr('cy', d => y1Scale(y1Accessor(d)))
+                .attr('r', 5)
+                .attr('fill', '#fff')
+                .attr("stroke", "orange")
+
+            // 繪製第二條折線圖
+            const line2 = svg.append('g')
+                .append("path")
+                .attr("d", lineChart(dataset2))
+                .attr("fill", "none")
+                .attr("stroke", "green")
+                .attr("stroke-width", 2);
+
+            let filteredData2 = dataset2.filter(lineChart.defined());
+
+            // 第二條覆蓋的dashed
+            svg.append('g')
+                .append("path")
+                .attr("d", lineChart(filteredData2))
+                .attr("fill", "none")
+                .attr("stroke", "green")
+                .attr("stroke-width", 2)
+                .style("stroke-dasharray", "4,4");
+
+
+            // 第二條折線圖圓點
+            svg.selectAll('.dot2')
+                .data(filteredData2)
+                .enter()
+                .append('g')
+                .classed('dot2', true)
+                .append('circle')
+                .attr('cx', d => xScale(xAccessor(d)) + margin)
+                .attr('cy', d => y1Scale(y1Accessor(d)))
+                .attr('r', 5)
+                .attr('fill', '#fff')
+                .attr("stroke", "green")
+
+
+            // 繪製長條圖
+            const barChart = svg.append('g')
+                .selectAll('rect')
+                .data(dataset)
+                .join('rect')
+                .attr('x', (d) => xScale(xAccessor(d)) + (margin))
+                .attr('y', (d) => y2Scale(y2Accessor(d)))
+                .attr('width', xScale.bandwidth() + 5)
+                .attr('height', (d) => chartHeight - y2Scale(y2Accessor(d)))
+                .attr('fill', '#FFA500')
+            // console.log(dataset.map(d => y2Scale(y2Accessor(d))))
+
+        }
+
+        getData()
+        d3.select(window).on('resize', rendering);
+    </script>
+</body>
+
+</html>

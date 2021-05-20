@@ -1,0 +1,89 @@
+{
+    "code": 200,
+    "msg": "success",
+    "objlist": [{
+            "Date": "202102",
+            "twDate": "110年2月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202101",
+            "twDate": "110年1月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202012",
+            "twDate": "109年12月",
+            "UnitPrice": 54.3750,
+            "TradeHouse": 2,
+            "Radius": "0"
+        },
+        {
+            "Date": "202011",
+            "twDate": "109年11月",
+            "UnitPrice": 54.6000,
+            "TradeHouse": 3,
+            "Radius": "0"
+        },
+        {
+            "Date": "202010",
+            "twDate": "109年10月",
+            "UnitPrice": 38.6400,
+            "TradeHouse": 1,
+            "Radius": "0"
+        },
+        {
+            "Date": "202009",
+            "twDate": "109年9月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202008",
+            "twDate": "109年8月",
+            "UnitPrice": 47.0500,
+            "TradeHouse": 1,
+            "Radius": "0"
+        },
+        {
+            "Date": "202007",
+            "twDate": "109年7月",
+            "UnitPrice": 55.2000,
+            "TradeHouse": 1,
+            "Radius": "0"
+        },
+        {
+            "Date": "202006",
+            "twDate": "109年6月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202005",
+            "twDate": "109年5月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202004",
+            "twDate": "109年4月",
+            "UnitPrice": 0.0000,
+            "TradeHouse": 0,
+            "Radius": "0"
+        },
+        {
+            "Date": "202003",
+            "twDate": "109年3月",
+            "UnitPrice": 51.3000,
+            "TradeHouse": 1,
+            "Radius": "0"
+        }
+    ]
+}
