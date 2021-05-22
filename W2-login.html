@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>w2 main homework</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            text-align: center;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+    </style>
+</head>
+<!-- https://rpg.hexschool.com/training/18/task -->
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row justify-content-center">
+                <h1 class="h3 mb-3 font-weight-normal">
+                    請先登入
+                </h1>
+                <div class="col-8">
+                    <form id="form" class="form-signin">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="username" placeholder="name@example.com"
+                                required autofocus>
+                            <label for="username">Email address</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <button class="loginbtn btn btn-lg btn-primary w-100 mt-3" type="submit">
+                            登入
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 接Axios與Bootstrap動態 -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js'
+        integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw=='
+        crossorigin='anonymous'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"
+        integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+        integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous">
+    </script>
+
+    <script>
+        const url = "https://vue3-course-api.hexschool.io";
+        const apiPath = "ffjjgogogo";
+
+        const loginbtn = document.querySelector('.loginbtn')
+        loginbtn.addEventListener('click', login);
+
+        function login(e) {
+            e.preventDefault();
+
+            // 用戶資訊
+            const username = document.querySelector('#username').value;
+            const password = document.querySelector('#password').value;
+
+            const user = {
+                username,
+                password
+            };
+            console.log(user)
+
+            // axios 的 post夾帶資料就是(路徑，資料)
+            axios.post(`${url}/admin/signin`, user)
+                .then(res => {
+                    console.log(res)
+                    // 如果成功發送，就夾帶token過去
+                    if (res.data.message == "登入成功") {
+                        const token = res.data.token,
+                            expired = res.data.expired;
+                        console.log(token, expired)
+                        // 處理cookie
+                        document.cookie = `hexToken=${token};expires=${new Date(expired)}; path=/`;
+                        // 轉址
+                        // window.location = 'products.html'
+                    } else {
+                        alert(res.data.message);
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+        }
+    </script>
+</body>
+
+</html>
