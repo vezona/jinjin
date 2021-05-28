@@ -101,20 +101,36 @@
                                                 class="form-control" placeholder="請輸入圖片連結">
                                             <img class="img-fluid" :src="img" alt="">
                                         </div>
+                                        <br>
+                                        <!-- 這邊是設定如果有多張圖片的話(編輯商品)，也需要出現新增刪除紐 -->
+                                        <div
+                                            v-if="!tempProduct.imagesUrl.length || tempProduct.imagesUrl[tempProduct.imagesUrl.length - 1]">
+                                            <button class="btn btn-outline-primary btn-sm d-block w-100"
+                                                @click="tempProduct.imagesUrl.push('')">
+                                                <!-- 這邊的push是建立一個新的空物件，因為上面的input框是用tempProduct去跑回圈 -->
+                                                <!-- 所以如果建立新的空物件，就會多出現一個輸入框 -->
+                                                新增圖片
+                                            </button>
+                                        </div>
+
+                                        <!-- 新增或編輯的"新增紐"需要分開，但是刪除扭只要一個，是因為一旦push進去tempProduct的陣列中，這個迴圈就會跑，就帶有刪除扭了 -->
+                                        <div v-else>
+                                            <button class="btn btn-outline-danger btn-sm d-block w-100"
+                                                @click="tempProduct.imagesUrl.pop()">
+                                                刪除圖片框
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- 這邊是說如果上面沒有多張圖片的話(建立新商品)，就出現新增圖片的按鈕 -->
+                                    <!-- 這邊的@click 多加了一個addNewImg的方法，是因為它不像上面是用迴圈跑出來的，所以要手動加入 -->
+                                    <div v-else>
+                                        <button class="btn btn-outline-primary btn-sm d-block w-100" @click="addNewImg">
+                                            新增圖片
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- 這邊是設定如果沒有多張圖片的話 -->
-                                <div>
-                                    <button class="btn btn-outline-primary btn-sm d-block w-100">
-                                        新增圖片
-                                    </button>
-                                </div>
-                                <div v-else>
-                                    <button class="btn btn-outline-danger btn-sm d-block w-100">
-                                        刪除圖片
-                                    </button>
-                                </div>
                             </div>
                             <div class="col-sm-8">
                                 <div class="form-group">

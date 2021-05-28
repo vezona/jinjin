@@ -123,10 +123,10 @@ const product = {
                 })
 
         },
-        addImg() {
-            this.tempProduct.imagesUrl = []
+        addNewImg() {
+            this.tempProduct.imagesUrl = [];
+            this.tempProduct.imagesUrl.push('')
         }
-
     }
 };
 
